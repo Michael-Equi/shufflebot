@@ -8,9 +8,8 @@ project(joint_ctrl)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  baxter_examples
-  baxter_external_devices
-  baxter_interface
+  intera_examples
+  intera_interface
   rospy
 )
 
