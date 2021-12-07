@@ -22,4 +22,4 @@ cv2.imshow("Original", img)
 cv2.imshow("Warped", warped)
 cv2.waitKey(0)
 
-run_clustering(warped, 4)
+#run_clustering(warped, 4)
