@@ -21,10 +21,14 @@ def findCorners(img):
     mask = cv2.inRange(img, lower, upper)
     output = cv2.bitwise_and(img, img, mask=mask)
 
+    # cv2.imshow("Result", output)
+    # cv2.waitKey(0)
+
     ret,thresh = cv2.threshold(mask, 40, 255, 0)
     #contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     _, contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
+    
 
     if len(contours) != 0:
         # draw in blue the contours that were founded
@@ -35,25 +39,38 @@ def findCorners(img):
         
         x,y,w,h = cv2.boundingRect(c)
         #print("aspect ratio", h/w)
-
-        if h/w > 1.05 or h/w < .95:
-            c = max(filter(lambda x: (x not in c), contours), key = cv2.contourArea)
+        # draw the biggest contour (c) in green
+        cache = output.copy()
+        cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
+        #cv2.drawContours(img, c, -1, (0, 0, 255), 3)
+        cv2.imshow("Result", output)
+        cv2.waitKey(10)
+        #check if the correct contour
+        user_in = raw_input("Is this correct? y or n:\n")
+        #if h/w > 1.05 or h/w < .95:
+        while user_in != "y":
+            output = cache.copy()
+            contours = filter(lambda x: (x not in c), contours)
+            c = max(contours, key = cv2.contourArea)
             if len(contours) != 0:
                 x,y,w,h = cv2.boundingRect(c)
                 print("aspect ratio", h/w)
-        # draw the biggest contour (c) in green
-        cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
-
+            cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
+            #cv2.drawContours(img, c, -1, (0, 0, 255), 3)
+            cv2.imshow("Result", output)
+            cv2.waitKey(10)
+            user_in = raw_input("Is this correct? y or n:\n")
     # show the images
-    #cv2.drawContours(img, c, -1, (0, 0, 255), 3)
-    #cv2.imshow("Result", np.hstack([img, output]))
-    #cv2.waitKey(0)
+    # cv2.drawContours(img, c, -1, (0, 0, 255), 3)
+    # cv2.imshow("Result", np.hstack([img, output]))
+    # cv2.waitKey(0)
+   
 
     perim = cv2.arcLength(c, True)
     epsilon = 0.02*perim
     approxCorners = cv2.approxPolyDP(c, epsilon, True)
-    approxCornersNumber = len(approxCorners)
-    print("Number of approximated corners: ", approxCornersNumber)
+    # approxCornersNumber = len(approxCorners)
+    # print("Number of approximated corners: ", approxCornersNumber)
     # print("Coordinates of approximated corners:\n", approxCorners)
     corner_points = np.array([[x[0][0], x[0][1]] for x in approxCorners])
     # print("input" ,(corner_points))
