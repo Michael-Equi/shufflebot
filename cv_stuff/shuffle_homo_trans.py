@@ -22,7 +22,8 @@ def findCorners(img):
     output = cv2.bitwise_and(img, img, mask=mask)
 
     ret,thresh = cv2.threshold(mask, 40, 255, 0)
-    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    #contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    _, contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
 
     if len(contours) != 0:
@@ -33,7 +34,7 @@ def findCorners(img):
         c = max(contours, key = cv2.contourArea)
         
         x,y,w,h = cv2.boundingRect(c)
-        print("aspect ratio", h/w)
+        #print("aspect ratio", h/w)
 
         if h/w > 1.05 or h/w < .95:
             c = max(filter(lambda x: (x not in c), contours), key = cv2.contourArea)
@@ -51,8 +52,8 @@ def findCorners(img):
     perim = cv2.arcLength(c, True)
     epsilon = 0.02*perim
     approxCorners = cv2.approxPolyDP(c, epsilon, True)
-    # approxCornersNumber = len(approxCorners)
-    # print("Number of approximated corners: ", approxCornersNumber)
+    approxCornersNumber = len(approxCorners)
+    print("Number of approximated corners: ", approxCornersNumber)
     # print("Coordinates of approximated corners:\n", approxCorners)
     corner_points = np.array([[x[0][0], x[0][1]] for x in approxCorners])
     # print("input" ,(corner_points))

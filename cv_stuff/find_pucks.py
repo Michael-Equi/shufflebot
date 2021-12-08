@@ -54,7 +54,8 @@ def find_pucks(image):
 
     ### Find Blue contours and centroids
     ret,thresh = cv2.threshold(mask_blue, 40, 255, 0)
-    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    #contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    _, contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     blue_pucks = []
     if len(contours) != 0:
         # draw in blue the contours that were founded
@@ -80,7 +81,8 @@ def find_pucks(image):
 
     ### Find all contours and centroids
     ret,thresh = cv2.threshold(mask, 40, 255, 0)
-    contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    #contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    _, contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     
     all_pucks = []
     if len(contours) != 0:
