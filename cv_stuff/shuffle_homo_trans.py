@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-from k_means import *
 
 # load the image
 
@@ -52,11 +51,11 @@ def findCorners(img):
     perim = cv2.arcLength(c, True)
     epsilon = 0.02*perim
     approxCorners = cv2.approxPolyDP(c, epsilon, True)
-    approxCornersNumber = len(approxCorners)
-    print("Number of approximated corners: ", approxCornersNumber)
-    print("Coordinates of approximated corners:\n", approxCorners)
+    # approxCornersNumber = len(approxCorners)
+    # print("Number of approximated corners: ", approxCornersNumber)
+    # print("Coordinates of approximated corners:\n", approxCorners)
     corner_points = np.array([[x[0][0], x[0][1]] for x in approxCorners])
-    print("input" ,(corner_points))
+    # print("input" ,(corner_points))
     return corner_points
     
 #corner_points = np.array([[362, 580], [789, 304], [613, 720], [362, 580]])
