@@ -5,7 +5,7 @@ from four_point_transform import *
 from shuffle_homo_trans import *
 
 # load the image
-img = cv2.imread("headcam.jpg", 1)
+img = cv2.imread("headcam.jpg", cv2.IMREAD_UNCHANGED)
 
 corner_points = findCorners(img)
 
@@ -22,4 +22,4 @@ cv2.imshow("Original", img)
 cv2.imshow("Warped", warped)
 cv2.waitKey(0)
 
-#run_clustering(warped, 4)
+run_clustering(warped, 4)

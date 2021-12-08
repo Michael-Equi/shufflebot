@@ -9,30 +9,41 @@ import numpy as np
 
 def run_clustering(image, clusters):
     # lower = [0,0,0]#[20, 20, 20]
-    # upper = [200, 200, 200]#[130, 130, 130]
+    # upper = [150, 150, 150]
     # lower = np.array(lower, dtype="uint8")
     # upper = np.array(upper, dtype="uint8")
-    # extract alpha channel
-    alpha = image[:,:,3]
-
-    # extract bgr channels
-    bgr = image[:,:,0:3]
+    # mask = cv2.inRange(image, lower, upper)
+    # masked0 = cv2.bitwise_and(image, image, mask=mask)
+    
 
     # convert to HSV
-    hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV)
-    h,s,v = cv2.split(hsv)
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+    
+    #h,s,v = cv2.split(hsv)
     # red is 0 in range 0 to 360; so half in OpenCV
     # blue is 240 in range 0 to 360; so half in OpenCV
     lower_red = 0
-    blue = 120
+    upper_red = 60 /2
+    lower_red2 = 300 /2
+    upper_red2 = 360 /2
+    lower_blue = 180 /2
+    upper_blue = 270 /2
 
-    mask = cv2.inRange(image, lower, upper)
-    masked = cv2.bitwise_and(image, image, mask=mask)
-    image = cv2.cvtColor(masked, cv2.COLOR_BGR2RGB)
+    mask0 = cv2.inRange(hsv, (lower_red, 0, 0), (upper_red, 255,255 ))
+    mask1 = cv2.inRange(hsv, (lower_red2, 0, 0), (upper_red2, 255,255 ))
+    mask2 = cv2.inRange(hsv, (lower_blue, 0, 0), (upper_blue, 255,255 ))
+    mask = cv2.bitwise_or(mask0, cv2.bitwise_or(mask1, mask2))
+    #(lower_red, lower_red2, lower_blue), (upper_red, upper_red2, upper_blue))
+    masked = cv2.bitwise_and(hsv, hsv, mask=mask)
+
+    
+    cv2.imshow('Masked Image', masked)
+    cv2.waitKey(0)
+    #image = cv2.cvtColor(masked, cv2.COLOR_HSV2RGB)
     # show our image
-    plt.figure()
-    plt.axis("off")
-    plt.imshow(masked)
+    # plt.figure()
+    # plt.axis("off")
+    # plt.imshow(masked)
 
     print(masked.shape)
     # reshape the image to be a list of pixels
