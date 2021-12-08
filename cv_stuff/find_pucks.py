@@ -3,7 +3,16 @@ import cv2
 import numpy as np
 # construct the argument parser and parse the arguments
 
-
+def farFromPoint(x, points):
+    epsilon = 5
+    for point in points:
+        distance = np.sqrt((x[1]-point[1])**2 + (x[0]-point[0])**2)
+        #print(distance)
+        if distance < epsilon:
+            print(distance)
+            return False
+    else:
+        return True
 
 def find_pucks(image):
     # lower = [0,0,0]#[20, 20, 20]
@@ -65,7 +74,7 @@ def find_pucks(image):
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         # show the image
 
-        print("blue:", blue_pucks)
+        # print("blue:", blue_pucks)
         # cv2.imshow("Image", image)
         # cv2.waitKey(0)
 
@@ -91,21 +100,12 @@ def find_pucks(image):
             cv2.circle(image, (cX, cY), 0, (0, 0, 255), thickness=3)
             cv2.putText(image, "center", (cX - 20, cY - 20),
                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-        print("all:", all_pucks)
+        # print("all:", all_pucks)
         # show the image
         # cv2.imshow("Image", image)
         # cv2.waitKey(0)
 
     red_pucks = list(filter((lambda x: farFromPoint(x, blue_pucks)), all_pucks))
-    print("red:" , red_pucks)
+    # print("red:" , red_pucks)
     return [blue_pucks, red_pucks]
-def farFromPoint(x, points):
-    epsilon = 5
-    for point in points:
-        distance = np.sqrt((x[1]-point[1])**2 + (x[0]-point[0])**2)
-        #print(distance)
-        if distance < epsilon:
-            print(distance)
-            return False
-    else:
-        return True
+    
