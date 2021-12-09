@@ -1,7 +1,6 @@
 import numpy as np
 import cv2
-from find_pucks import *
-from shuffle_homo_trans import *
+from utils import *
 
 warped = cv2.imread("warped.jpg", cv2.IMREAD_UNCHANGED)
 
