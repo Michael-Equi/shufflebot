@@ -90,7 +90,7 @@ class ShuffleBot:
         # strike puck
         t = 1
         for i in range(int(t * 10)):
-            right_arm.set_joint_velocities(np.array([0, 0, 0, 0, 0, hit_vel, 0]) # TODO: may be negative
+            right_arm.set_joint_velocities(np.array([0, 0, 0, 0, 0, hit_vel, 0])) # TODO: may be negative
             time.sleep(0.1)
         right_arm.set_joint_velocities(np.zeros(7))
         raw_input()
