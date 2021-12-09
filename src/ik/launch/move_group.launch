@@ -1,8 +1,8 @@
 <launch>
 
-  <param name="robot_description" type="str" textfile="$(find ik)/src/baxter.urdf" />
+  <param name="robot_description" type="str" textfile="$(find ik)/src/\sawyer.urdf" />
 
-  <include file="$(find baxter_moveit_config)/launch/planning_context.launch" />
+  <include file="$(find sawyer_moveit_config)/launch/planning_context.launch" />
 
   <arg name="debug" default="false" />
   <arg unless="$(arg debug)" name="launch_prefix" value="" />
@@ -17,17 +17,17 @@
   <arg name="jiggle_fraction" default="0.05" />
   <arg name="publish_monitored_planning_scene" default="true"/>
 
-  <include ns="move_group" file="$(find baxter_moveit_config)/launch/planning_pipeline.launch">
+  <include ns="move_group" file="$(find sawyer_moveit_config)/launch/planning_pipeline.launch.xml">
     <arg name="pipeline" value="ompl" />
   </include>
 
-  <include ns="move_group" file="$(find baxter_moveit_config)/launch/trajectory_execution.launch" if="$(arg allow_trajectory_execution)">
-    <arg name="moveit_controller_manager" value="baxter" /> 
+  <include ns="move_group" file="$(find sawyer_moveit_config)/launch/trajectory_execution.launch" if="$(arg allow_trajectory_execution)">
+    <arg name="moveit_controller_manager" value="sawyer" /> 
     <arg name="moveit_manage_controllers" value="true" />
   </include>
 
-  <include ns="move_group" file="$(find baxter_moveit_config)/launch/sensor_manager.launch" if="$(arg allow_trajectory_execution)">
-    <arg name="moveit_sensor_manager" value="baxter" /> 
+  <include ns="move_group" file="$(find sawyer_moveit_config)/launch/sensor_manager.launch" if="$(arg allow_trajectory_execution)">
+    <arg name="moveit_sensor_manager" value="sawyer" /> 
   </include>
 
   <node name="move_group" launch-prefix="$(arg launch_prefix)" pkg="moveit_ros_move_group" type="move_group" respawn="false" output="screen" args="joint_states:=/robot/joint_states $(arg command_args)">

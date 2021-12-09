@@ -1,8 +1,10 @@
 import numpy as np
+import os
 import scipy.spatial
 import rospy
 import intera_interface
 from moveit_commander import MoveGroupCommander # TODO: might be wrong import I don't really remember
+import yaml
 
 class ShuffleBot:
     table_z = -0.2
@@ -27,9 +29,9 @@ class ShuffleBot:
         # move to pre-grasp pose
 
 
-    def move_to_joint_angles(joint_angles):
+    def move_to_joint_angles(self, joint_angles):
         # TODO: make this way less awful by using what gtja.py uses rather than os hacking it
-        os.system("rosrun intera_examples go_to_joint_angles.py " + str(joint_angles)[1:-2])
+        os.system("rosrun intera_examples go_to_joint_angles.py -q " + str(joint_angles)[1:-2].replace('  ', ' ').replace('\n', ''))
 
     def move_cartesian(self, target_pose, speed):
         Kp = np.diag(np.array([1, 1, 1, 0.1, 0.1, 0.1]))
@@ -40,11 +42,6 @@ class ShuffleBot:
         def to_vector(pose):
             quat = np.array([pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w])
             angles = scipy.spatial.transform.Rotation.from_quat(quat).as_euler('xyz')
-            # print(angles)
-            # import sys
-            # sys.exit()
-            # return np.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z, pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w])
-            # return np.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z, angles[0], angles[1], angles[2]])
             return np.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z, 0, 0, 0])
 
         pose = to_vector(self.group.get_current_pose())
@@ -63,7 +60,7 @@ class ShuffleBot:
 
             jv = np.dot(Jinv, np.array(vel, dtype=np.float64))
             _, s, _= np.linalg.svd(Js)
-            # print "manipulability: " +  str(np.prod(s))
+            print "manipulability: " +  str(np.prod(s))
             self.right_arm.set_joint_velocities(dict(zip(self.right_arm.joint_names(), jv)))
 
         self.right_arm.set_joint_velocities(dict(zip(self.right_arm.joint_names(), np.array([0,0,0,0,0,0,0]))))
@@ -84,20 +81,20 @@ class ShuffleBot:
         
 
 if __name__ == "__main__":
+    sb = ShuffleBot()
     def to_vector(pose):
             quat = np.array([pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w])
             angles = scipy.spatial.transform.Rotation.from_quat(quat).as_euler('xyz')
-            print(angles)
-            # import sys
-            # sys.exit()
-            # return np.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z, pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w])
-            return np.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z, angles[0], angles[1], angles[2]])
+            return np.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z, 0, 0, 0])
 
-
-    sb = ShuffleBot()
-    # 0.61800175  0.43432609 -0.16154648 -3.06791751  0.16891664  3.12241864
-    # sb.move_cartesian(np.array([0.61800175,  0.43432609, -0.16154648, -3.06791751,  0.16891664,  3.12241864]), 0)
-    print(to_vector(sb.group.get_current_pose()))
-    print(sb.group.get_current_joint_values())
-    sb.move_cartesian(np.array([ 8.05430221e-01, -1.78980005e-01, -2.45e-01, 0, 0, 0]), 0)
-
+    f = open("poses.yaml", "r")
+    pose_dict = yaml.load(f)
+    print "Poses:", pose_dict.keys()
+    while True:
+        name = raw_input("Type name and press enter to go to pose: ")
+        try:
+            pose = pose_dict[name]
+        except:
+            continue
+        js = np.array([float(v) for v in pose['joints'].replace('[','').replace(']', '').replace(' ', '').split(',')])
+        sb.move_to_joint_angles(js)
