@@ -135,24 +135,27 @@ class ShuffleBoardGame:
         state = sim.State(self.num_pucks)
         ai = players.SimPlayer(self)
 
-        teams = {}
+        teams = {0:'blue', 1:'red', 2:'blue', 3:'red', 4:'blue', 5:'red', 6:'blue', 7:'red'}
         for i in range(self.num_pucks):
             if i % 2 == 0:
-                teams[i] = 'blue'
-                input("Press enter once human shot is complete")
+                raw_input("Press enter once human shot is complete")
             else:
-                teams[i] = 'red'
                 robo_shot = ai.calc_move(1, state, i)
-                shufflebot.perform_shot(robo_shot)
+                _, xs = self.sim_turn(state, i, *robo_shot)
+                sim.animate(xs, self.dt, self.length, self.width, teams)
+                # shufflebot.perform_shot(robo_shot)
             puck_locs = get_real_board_state(game.length, game.width)
             state = sim.State(self.num_pucks)
-            for i in range(self.num_pucks):
-                state.set_x(i, puck_locs[i%2][int(i/2)][::-1])
+            for idx, blue_puck in enumerate(puck_locs[0]):
+                state.set_x(idx*2, blue_puck[::-1])
+            for idx, red_puck in enumerate(puck_locs[1]):
+                state.set_x(idx*2+1, red_puck[::-1])
         
         score = self.score_board(state)
         print("Human Score: " + str(score[0]))
         print("Robot Score: " + str(score[1]))
 
+        plt.close('all')
         fig, ax = plt.subplots(figsize=(3, 6))
         for puck in range(self.num_pucks):
             pos = state.get_x(puck)
@@ -160,6 +163,7 @@ class ShuffleBoardGame:
                 ax.add_artist(plt.Circle(pos, self.puck_rad, color=teams[puck]))
             else:
                 ax.add_artist(plt.Circle(pos, self.puck_rad, color="pink"))
+
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         plt.axis('square')
@@ -172,8 +176,8 @@ class ShuffleBoardGame:
 
 if __name__ == '__main__':
     game = ShuffleBoardGame()
-    # # game.run_real_game()
-    game.run_sim_game()
+    game.run_real_game()
+    # game.run_sim_game()
 
     # puck_locs = get_real_board_state(game.length, game.width)
     # state = sim.State(game.num_pucks)

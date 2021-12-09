@@ -9,9 +9,10 @@ from intera_interface import gripper as robot_gripper
 import time
 
 class ShuffleBot:
-    table_z = -0.2
+    table_z = -0.23
     num_pucks = 4
     numbers = ["one", "two", "three", "four"]
+    hit_positions = np.array([0.17, 0.25, 0.36])
 
     def __init__(self):
         self.puck = 0
@@ -27,40 +28,75 @@ class ShuffleBot:
 
     def perform_shot(x_pos, y_pos, x_vel, y_vel):
         theta = np.atan2(y_vel, x_vel) - np.pi / 2 # heading from North
+        v = np.sqrt(x_vel**2 + y_vel**2)
+        hit_vel = v / np.cos(theta)
+        x_id = np.argmin(np.abs(hit_positions - x_pos)) + 1
+
         # move robot to home pose
         self.move_to_pose("home")
         raw_input()
 
         # move to pre-grasp pose
         self.move_to_pose(numbers[self.puck])
-        time.sleep(1)
+        time.sleep(2)
 
         # open gripper
         self.open_gripper()
         raw_input()
 
         # move to grasp pose
-        to_pose = self.group.get_current_pose()
-        
+        grasp_pose = self.group.get_current_pose()
+        grasp_pose.position.z = ShuffleBot.table_z
+        self.move_cartesian(grasp_pose)
+        time.sleep(2)
+
         # close gripper
+        self.close_gripper()
+        raw_input()
 
         # return to pre-grasp
+        self.move_to_pose(numbers[self.puck])
+        time.sleep(2)
 
         # return to home pose
+        self.move_to_pose("home")
+        raw_input()
 
-        # go to hit pose # TODO: michael start
+        # go to hit pose
+        self.move_to_pose("hit" + str(x_id))
+        time.sleep(2)
 
         # open gripper
+        self.open_gripper()
+        time.sleep(1)
 
         # raise gripper
+        raised_pose = self.group.get_current_pose()
+        raised_pose.position.z += 0.04
+        self.move_cartesian(raised_pose)
+        raw_input()
 
         # wind up for strike
+        j_angles = self.group.get_current_joint_values()
+        j_angles += [0, 0, 0, 0, 0, -0.3, theta] # TODO: might be negative
+        raw_input()
 
         # lower gripper
+        lowered_pose = self.group.get_current_pose()
+        lowered_pose.position.z -= 0.04
+        self.move_cartesian(raised_pose)
+        raw_input()
 
         # strike puck
+        t = 1
+        for i in range(int(t * 10)):
+            right_arm.set_joint_velocities(np.array([0, 0, 0, 0, 0, hit_vel, 0])) # TODO: may be negative
+            time.sleep(0.1)
+        right_arm.set_joint_velocities(np.zeros(7))
+        raw_input()
 
-        # go to home pose # TODO: michael end
+        # go to home pose
+        self.go_to_pose("home")
 
         # iterate puck number
         self.puck += 1
@@ -83,11 +119,10 @@ class ShuffleBot:
     def move_to_joint_angles(self, joint_angles):
         os.system("rosrun intera_examples go_to_joint_angles.py -q " + str(joint_angles)[1:-2].replace('  ', ' ').replace('\n', ''))
 
-    def move_cartesian(self, target_pose, speed):
+    def move_cartesian(self, target_pose):
         Kp = np.diag(np.array([1, 1, 1, 0.1, 0.1, 0.1]))
         Kd = 0
         Ki = 0
-
 
         def to_vector(pose):
             quat = np.array([pose.pose.orientation.x, pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w])

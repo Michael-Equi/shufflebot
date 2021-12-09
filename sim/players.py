@@ -79,7 +79,7 @@ class SimPlayer(Player):
                 shot_scores = -shot_scores
 
             np.set_printoptions(formatter={'float': lambda x: "{0:0.2f}".format(x)}, threshold=10000)
-            print(shot_scores)
+            # print(shot_scores)
             shot_scores = gaussian_filter(shot_scores, sigma=(0,1,1), mode='constant')
 
             max_shot_val = np.max(shot_scores)
