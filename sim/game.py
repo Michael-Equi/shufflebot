@@ -143,7 +143,7 @@ class ShuffleBoardGame:
             else:
                 teams[i] = 'blue'
                 robo_shot = ai.calc_move(1, state, i)
-                perform_shot(robo_shot) # TODO: Create perform_shot to make robot shoot based on input
+                shufflebot.perform_shot(robo_shot)
             puck_locs = get_real_board_state(game.length, game.width)
             state = sim.State(self.num_pucks)
             for i in range(self.num_pucks):
