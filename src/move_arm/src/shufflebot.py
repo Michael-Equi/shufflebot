@@ -6,10 +6,12 @@ import intera_interface
 from moveit_commander import MoveGroupCommander # TODO: might be wrong import I don't really remember
 import yaml
 from intera_interface import gripper as robot_gripper
+import time
 
 class ShuffleBot:
     table_z = -0.2
     num_pucks = 4
+    numbers = ["one", "two", "three", "four"]
 
     def __init__(self):
         self.puck = 0
@@ -25,8 +27,24 @@ class ShuffleBot:
 
     def throw(x_pos, y_pos, x_vel, y_vel):
         theta = np.atan2(y_vel, x_vel) - np.pi / 2 # heading from North
-        # move robot to grasp puck
+        # move robot to home pose
+        self.move_to_pose("home")
+        raw_input()
+
         # move to pre-grasp pose
+        self.move_to_pose(numbers[self.puck])
+        time.sleep(1)
+
+        # open gripper
+        self.open_gripper()
+        raw_input()
+
+        # move to grasp pose
+        to_pose = self.group.get_current_pose()
+        
+
+        # iterate puck number
+        self.puck += 1
 
     def open_gripper(self):
         self.gripper.open()
@@ -34,7 +52,7 @@ class ShuffleBot:
     def close_gripper(self):
         self.gripper.close()
 
-    def to_pose(self, pose_name):
+    def move_to_pose(self, pose_name):
         try:
             pose = pose_dict[name]
         except:
