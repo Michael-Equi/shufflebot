@@ -25,27 +25,27 @@ def order_points(img, pts):
     # rect[1] = pts[np.argmin(diff)]
     # rect[3] = pts[np.argmax(diff)]
 
-    pts = [x for x in pts]
-    pts.sort(key=lambda x: x[1])
-    pts_bot = pts[2:]
-    pts_bot.sort(key=lambda x: x[0])
-    pts_top = pts[:2]
-    pts_top.sort(key=lambda x: -x[0])
-    pts_top.extend(pts_bot)
-    rect = np.array(pts_top, dtype = "float32")
+    # pts = [x for x in pts]
+    # pts.sort(key=lambda x: x[1])
+    # pts_bot = pts[2:]
+    # pts_bot.sort(key=lambda x: x[0])
+    # pts_top = pts[:2]
+    # pts_top.sort(key=lambda x: -x[0])
+    # pts_top.extend(pts_bot)
+    # rect = np.array(pts_top, dtype = "float32")
 
     # # return the ordered coordinates
-    # top_left = np.array([0, 0])
-    # top_right = np.array([img.shape[1], 0])
-    # bottom_left = np.array([0, img.shape[0]])
-    # bottom_right = np.array([img.shape[1], img.shape[0]])
+    top_left = np.array([0, 0])
+    top_right = np.array([img.shape[1], 0])
+    bottom_left = np.array([0, img.shape[0]])
+    bottom_right = np.array([img.shape[1], img.shape[0]])
 
-    # targets = np.array([top_left, top_right, bottom_right, bottom_left])
-    # #print(pts.shape)
-    # perms = np.array(list(itertools.permutations(pts)))
-    # #print(perms.shape, targets.shape)
-    # best_combo = np.argmin(np.sum(np.linalg.norm(perms - targets, axis=1), axis=1))
-    # rect = np.array(perms[best_combo], dtype = "float32")
+    targets = np.array([top_left, top_right, bottom_right, bottom_left])
+    #print(pts.shape)
+    perms = np.array(list(itertools.permutations(pts)))
+    #print(perms.shape, targets.shape)
+    best_combo = np.argmin(np.sum(np.linalg.norm(perms - targets, axis=1), axis=1))
+    rect = np.array(perms[best_combo], dtype = "float32")
     # return the ordered coordinates
     return rect
 	
@@ -87,7 +87,7 @@ def four_point_transform(image, pts, pixel_height, pixel_width):
     warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
     
     resized = cv2.resize(warped, (pixel_height, pixel_width))
-    rotated = cv2.rotate(resized, cv2.ROTATE_90_CLOCKWISE)
+    rotated = cv2.rotate(resized, cv2.ROTATE_90_COUNTERCLOCKWISE)
     # return the warped image
     return rotated
 
@@ -143,15 +143,15 @@ def findCorners(img):
         c = max(contours, key = cv2.contourArea)
         
         # x,y,w,h = cv2.boundingRect(c)
-        #print("aspect ratio", h/w)
-        # draw the biggest contour (c) in green
-        # cache = output.copy()
+        # #print("aspect ratio", h/w)
+        # # draw the biggest contour (c) in green
+        # # cache = output.copy()
         # cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
         # # cv2.drawContours(img, c, -1, (0, 0, 255), 3)
         # outputS = cv2.resize(output, (960, 540))
         # cv2.imshow("Result", outputS)
         # cv2.waitKey(10)
-        #check if the correct contour
+        # #check if the correct contour
         # user_in = raw_input("Is this correct? y or n:\n")
         # #if h/w > 1.05 or h/w < .95:
         # while user_in != "y":

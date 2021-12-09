@@ -8,22 +8,21 @@ def get_real_board_state(length, width, pixel_height=800, pixel_width=150):
     # load the image
     img = getImage()
     
-
-    # corner_points = findCorners(img)
-    corner_points = [0]
+    median = cv2.medianBlur(img,13)
+    corner_points = findCorners(median)
     while len(corner_points) != 4:
         img = getImage()
         corner_points = homoFromMouse(img)
-    median = cv2.medianBlur(img,13)
-    # for corner in corner_points:
-    #     cv2.circle(img, tuple(corner), radius=0, color=(0, 0, 255), thickness=50)
-    # imgS = cv2.resize(img, (960, 540))
-    # cv2.imshow("circled", imgS)
-    # cv2.waitKey(0)
+    
+    for corner in corner_points:
+        cv2.circle(img, tuple(corner), radius=0, color=(0, 0, 255), thickness=10)
+    imgS = cv2.resize(img, (960, 540))
+    cv2.imshow("circled", imgS)
+    cv2.waitKey(0)
     print(corner_points)
     warped = four_point_transform(median, corner_points, pixel_height, pixel_width)
-    warpedS = cv2.resize(warped, (150, 800))
-    cv2.imshow("warped", warpedS)
+    # warpedS = cv2.resize(warped, (150, 800))
+    cv2.imshow("warped", warped)
     cv2.waitKey(0)
     
     blue_pucks, red_pucks = find_pucks(warped)
