@@ -87,9 +87,10 @@ def four_point_transform(image, pts):
     warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
     HEIGHT = 800
     WIDTH = 150
-    resized = cv2.resize(warped, (WIDTH, HEIGHT))
+    resized = cv2.resize(warped, (HEIGHT, WIDTH))
+    rotated = cv2.rotate(resized, cv2.ROTATE_90_CLOCKWISE)
     # return the warped image
-    return resized
+    return rotated
 
 
 
@@ -114,7 +115,7 @@ def findDistances(imageDimesions, realDimensions, points):
 def findCorners(img):
     # img = cv2.imread("orig_headcam.jpg", 1)
     #lower = [100, 130, 130]
-    lower = [90, 105, 110]
+    lower = [110, 110, 130]
     upper = [255, 255, 255]
     
 
@@ -126,7 +127,6 @@ def findCorners(img):
     # the mask
     mask = cv2.inRange(img, lower, upper)
     output = cv2.bitwise_and(img, img, mask=mask)
-
     # cv2.imshow("Result", output)
     # cv2.waitKey(0)
 
@@ -143,29 +143,31 @@ def findCorners(img):
         # find the biggest countour (c) by the area
         c = max(contours, key = cv2.contourArea)
         
-        x,y,w,h = cv2.boundingRect(c)
+        # x,y,w,h = cv2.boundingRect(c)
         #print("aspect ratio", h/w)
         # draw the biggest contour (c) in green
-        cache = output.copy()
-        cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
-        #cv2.drawContours(img, c, -1, (0, 0, 255), 3)
-        # cv2.imshow("Result", output)
+        # cache = output.copy()
+        # cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
+        # # cv2.drawContours(img, c, -1, (0, 0, 255), 3)
+        # outputS = cv2.resize(output, (960, 540))
+        # cv2.imshow("Result", outputS)
         # cv2.waitKey(10)
         #check if the correct contour
-        user_in = raw_input("Is this correct? y or n:\n")
-        #if h/w > 1.05 or h/w < .95:
-        while user_in != "y":
-            output = cache.copy()
-            contours = filter(lambda x: (x not in c), contours)
-            c = max(contours, key = cv2.contourArea)
-            if len(contours) != 0:
-                x,y,w,h = cv2.boundingRect(c)
-                #print("aspect ratio", h/w)
-            cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
-            #cv2.drawContours(img, c, -1, (0, 0, 255), 3)
-            # cv2.imshow("Result", output)
-            # cv2.waitKey(10)
-            user_in = raw_input("Is this correct? y or n:\n")
+        # user_in = raw_input("Is this correct? y or n:\n")
+        # #if h/w > 1.05 or h/w < .95:
+        # while user_in != "y":
+        #     output = cache.copy()
+        #     contours = filter(lambda x: (x not in c), contours)
+        #     c = max(contours, key = cv2.contourArea)
+        #     if len(contours) != 0:
+        #         x,y,w,h = cv2.boundingRect(c)
+        #         #print("aspect ratio", h/w)
+        #     cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
+        #     #cv2.drawContours(img, c, -1, (0, 0, 255), 3)
+        #     outputS = cv2.resize(output, (960, 540))
+        #     cv2.imshow("Result", outputS)
+        #     cv2.waitKey(10)
+        #     user_in = raw_input("Is this correct? y or n:\n")
     # show the images
     # cv2.drawContours(img, c, -1, (0, 0, 255), 3)
     # cv2.imshow("Result", np.hstack([img, output]))
@@ -213,25 +215,33 @@ def find_pucks(image):
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
     lower_red = 0
-    upper_red = 30 /2
-    lower_red2 = 330 /2
+    upper_red = 20 /2
+    lower_red2 = 340 /2
     upper_red2 = 360 /2
     lower_blue = 210 /2
     upper_blue = 270 /2
 
-    mask0 = cv2.inRange(hsv, (lower_red, 10, 30), (upper_red, 255,255 ))
-    mask1 = cv2.inRange(hsv, (lower_red2, 30, 50), (upper_red2, 255,255 ))
+    mask0 = cv2.inRange(hsv, (lower_red, 60, 120), (upper_red, 255,255 ))
+    mask1 = cv2.inRange(hsv, (lower_red2, 60, 120), (upper_red2, 255,255 ))
     mask_blue = cv2.inRange(hsv, (lower_blue, 10, 10), (upper_blue, 255,255 ))
     mask_red = cv2.bitwise_or(mask0, mask1)
     # mask = cv2.bitwise_or(mask_blue, mask_red)
     mask = cv2.inRange(hsv, (0, 0, 0), (255, 255, 100))
-    #(lower_red, lower_red2, lower_blue), (upper_red, upper_red2, upper_blue))
-    masked = cv2.bitwise_and(image, image, mask=mask)
-    # cv2.imshow('Mask', mask_red)
+
+    # mask_redS = cv2.resize(mask_red, (150, 800))
+    # cv2.imshow('Mask', mask_redS)
     # cv2.waitKey(0)
-    # cv2.imshow('Mask1', mask_blue)
+
+    # mask_red0S = cv2.resize(mask0, (150, 800))
+    # cv2.imshow('Mask0', mask_redS)
     # cv2.waitKey(0)
-    # cv2.imshow('Masked Image', masked)
+
+    # mask_red1S = cv2.resize(mask1, (150, 800))
+    # cv2.imshow('Mask2', mask_redS)
+    # cv2.waitKey(0)
+
+    # mask_blueS = cv2.resize(mask_blue, (150, 800))
+    # cv2.imshow('Mask1', mask_blueS)
     # cv2.waitKey(0)
 
 
@@ -248,14 +258,15 @@ def find_pucks(image):
 
         for c in contours:
             M = cv2.moments(c)
-            cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
-            blue_pucks.append((cX, cY))
-            # draw the contour and center of the shape on the image
-            cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
-            cv2.circle(image, (cX, cY), 0, (0, 0, 255), thickness=3)
-            cv2.putText(image, "center", (cX - 20, cY - 20),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+            if M["m00"] != 0:
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+                blue_pucks.append((cX, cY))
+                # draw the contour and center of the shape on the image
+                # cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
+                # cv2.circle(image, (cX, cY), 0, (0, 0, 255), thickness=3)
+                # cv2.putText(image, "center", (cX - 20, cY - 20),
+                #     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         # show the image
 
         # print("blue:", blue_pucks)
@@ -263,37 +274,45 @@ def find_pucks(image):
         # cv2.waitKey(0)
 
     ### Find all contours and centroids
-    ret,thresh = cv2.threshold(mask, 40, 255, 0)
+    ret,thresh = cv2.threshold(mask_red, 40, 255, 0)
     #contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     _, contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     
-    all_pucks = []
+    red_pucks = []
     if len(contours) != 0:
         # draw in blue the contours that were founded
         # cv2.drawContours(image, contours, -1, 255, 3)
         # cv2.imshow("contours", image)
         # cv2.waitKey(0)
 
-        
         for c in contours:
             M = cv2.moments(c)
-            cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
-            all_pucks.append((cX, cY))
-            # draw the contour and center of the shape on the image
-            cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
-            cv2.circle(image, (cX, cY), 0, (0, 0, 255), thickness=3)
-            cv2.putText(image, "center", (cX - 20, cY - 20),
-                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+            if M["m00"] != 0:
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+                red_pucks.append((cX, cY))
+                # draw the contour and center of the shape on the image
+                # cv2.drawContours(image, [c], -1, (0, 255, 0), 2)
+                # cv2.circle(image, (cX, cY), 0, (0, 0, 255), thickness=3)
+                # cv2.putText(image, "center", (cX - 20, cY - 20),
+                #     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
         # print("all:", all_pucks)
         # show the image
         # cv2.imshow("Image", image)
         # cv2.waitKey(0)
 
-    red_pucks = list(filter((lambda x: farFromPoint(x, blue_pucks, epsilon=5)), all_pucks))
+    # red_pucks = list(filter((lambda x: farFromPoint(x, blue_pucks, epsilon=5)), all_pucks))
     # print("red:" , red_pucks)
     return [blue_pucks, red_pucks]
     
 def getImage():
-    img = cv2.imread("cv_stuff/headcam.jpg", 1)
+    #img = cv2.imread("cv_stuff/headcam.jpg", 1)
+    img = cv2.imread("./1250t3.jpg", 1)
     return img
+    # cam_port = 0
+    # cam = cv2.VideoCapture(cam_port)
+    # result, image = cam.read()
+    # if result:
+    #     return image
+    # else:
+    #     print("No image")
