@@ -45,7 +45,9 @@ def get_real_board_state(length, width):
     red_pucks_real = findDistances(warped.shape[0:2], (length, width), red_pucks)
     print(blue_pucks_real, red_pucks_real)
     return blue_pucks_real, red_pucks_real
+    
+if __name__=="__main__":
 
-length = 2.4384
-width = 0.4572
-get_real_board_state(length, width)
+    length = 2.4384
+    width = 0.4572
+    get_real_board_state(length, width)
