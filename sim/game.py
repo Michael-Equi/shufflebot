@@ -98,11 +98,11 @@ class ShuffleBoardGame:
         teams = {} # This should only be used for visualization
         for i in range(self.num_pucks):
             if i % 2 == 0:
-                teams[i] = 'red'
+                teams[i] = 'blue'
                 # state, xs = self.sim_turn(state, i, self.width/2,0.1,0.0,1.1)
                 state, xs = self.sim_turn(state, i, *p1.calc_move(0, state, i))
             else:
-                teams[i] = 'blue'
+                teams[i] = 'red'
                 # state, xs = self.sim_turn(state, i, 0,0,0,0)
                 state, xs = self.sim_turn(state, i, *p2.calc_move(1, state, i))
             print(self.score_board(state))
@@ -138,10 +138,10 @@ class ShuffleBoardGame:
         teams = {}
         for i in range(self.num_pucks):
             if i % 2 == 0:
-                teams[i] = 'red'
+                teams[i] = 'blue'
                 input("Press enter once human shot is complete")
             else:
-                teams[i] = 'blue'
+                teams[i] = 'red'
                 robo_shot = ai.calc_move(1, state, i)
                 shufflebot.perform_shot(robo_shot)
             puck_locs = get_real_board_state(game.length, game.width)
