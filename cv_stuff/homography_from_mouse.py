@@ -11,7 +11,9 @@ def click_event(event, x, y, flags, params):
 
 def homoFromMouse(img):
     # displaying the image
-    cv2.imshow('image', img)
+    imgS = cv2.resize(img, (960, 540))
+    cv2.imshow("circled", imgS)
+    cv2.waitKey(0)
     points = []
     # setting mouse handler for the image
     # and calling the click_event() function
