@@ -20,7 +20,7 @@ class ShuffleBot:
         self.group = MoveGroupCommander("right_arm")
         self.right_arm = intera_interface.limb.Limb("right")
         self.gripper = robot_gripper.Gripper("right")
-        f = open("poses.yaml", "r")
+        f = open("src/poses.yaml", "r")
         self.pose_dict = yaml.load(f)
 
     def poses(self):

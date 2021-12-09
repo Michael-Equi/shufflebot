@@ -306,12 +306,12 @@ def find_pucks(image):
     
 def getImage():
     #img = cv2.imread("cv_stuff/headcam.jpg", 1)
-    img = cv2.imread("./1250t3.jpg", 1)
-    return img
-    # cam_port = 0
-    # cam = cv2.VideoCapture(cam_port)
-    # result, image = cam.read()
-    # if result:
-    #     return image
-    # else:
-    #     print("No image")
+    # img = cv2.imread("./1250t3.jpg", 1)
+    # return img
+    cam_port = 0
+    cam = cv2.VideoCapture(cam_port)
+    result, image = cam.read()
+    if result:
+        return image
+    else:
+        print("No image")

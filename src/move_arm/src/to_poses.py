@@ -87,7 +87,7 @@ if __name__ == "__main__":
             angles = scipy.spatial.transform.Rotation.from_quat(quat).as_euler('xyz')
             return np.array([pose.pose.position.x, pose.pose.position.y, pose.pose.position.z, 0, 0, 0])
 
-    f = open("poses.yaml", "r")
+    f = open("src/poses.yaml", "r")
     pose_dict = yaml.load(f)
     print "Poses:", pose_dict.keys()
     while True:

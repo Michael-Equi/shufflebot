@@ -7,7 +7,7 @@ from random import seed
 
 import sim
 import players
-# import src.shufflebot as shufflebot
+import src.shufflebot as shufflebot
 from cv_stuff.shuffle_board_cv import get_real_board_state
 
 class ShuffleBoardGame:
@@ -22,6 +22,7 @@ class ShuffleBoardGame:
     def __init__(self):
         self.dt = 0.01
         self.sim = sim.ShuffleBoardSim(self.dt)
+        self.sb = shufflebot.ShuffleBot()
 
     def sim_turn(self, state, puck, x_pos, y_pos, x_vel, y_vel):
         original_x = state.get_all(puck)
@@ -143,7 +144,7 @@ class ShuffleBoardGame:
                 robo_shot = ai.calc_move(1, state, i)
                 _, xs = self.sim_turn(state, i, *robo_shot)
                 sim.animate(xs, self.dt, self.length, self.width, teams)
-                # shufflebot.perform_shot(robo_shot)
+                self.sb.perform_shot(robo_shot)
             puck_locs = get_real_board_state(game.length, game.width)
             state = sim.State(self.num_pucks)
             for idx, blue_puck in enumerate(puck_locs[0][:4]):
