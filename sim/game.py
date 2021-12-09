@@ -14,9 +14,9 @@ class ShuffleBoardGame:
     width = 0.4572
     puck_rad = 0.026
     num_pucks = 8
-    sl_3 = length * (23.0/24.0)
-    sl_2 = length * (22.0/24.0)
-    sl_1 = length * (12.0/24.0)
+    sl_3 = length * (91.0/96.0)
+    sl_2 = length * (86.0/96.0)
+    sl_1 = length * (48.0/96.0)
 
     def __init__(self):
         self.dt = 0.01
