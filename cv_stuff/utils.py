@@ -149,8 +149,8 @@ def findCorners(img):
         cache = output.copy()
         cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
         #cv2.drawContours(img, c, -1, (0, 0, 255), 3)
-        cv2.imshow("Result", output)
-        cv2.waitKey(10)
+        # cv2.imshow("Result", output)
+        # cv2.waitKey(10)
         #check if the correct contour
         user_in = raw_input("Is this correct? y or n:\n")
         #if h/w > 1.05 or h/w < .95:
@@ -163,8 +163,8 @@ def findCorners(img):
                 #print("aspect ratio", h/w)
             cv2.rectangle(output,(x,y),(x+w,y+h),(0,255,0),2)
             #cv2.drawContours(img, c, -1, (0, 0, 255), 3)
-            cv2.imshow("Result", output)
-            cv2.waitKey(10)
+            # cv2.imshow("Result", output)
+            # cv2.waitKey(10)
             user_in = raw_input("Is this correct? y or n:\n")
     # show the images
     # cv2.drawContours(img, c, -1, (0, 0, 255), 3)
@@ -207,8 +207,8 @@ def farFromPoint(x, points, epsilon=5):
 
 ### Find centroids of pucks in a warped image of shuffleboard table
 def find_pucks(image):
-    cv2.imshow("image", image)
-    cv2.waitKey(0)
+    # cv2.imshow("image", image)
+    # cv2.waitKey(0)
     # convert to HSV
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
@@ -295,5 +295,5 @@ def find_pucks(image):
     return [blue_pucks, red_pucks]
     
 def getImage():
-    img = cv2.imread("headcam.jpg", 1)
+    img = cv2.imread("cv_stuff/headcam.jpg", 1)
     return img

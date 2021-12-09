@@ -21,10 +21,10 @@ def get_real_board_state():
 
 
     blue_pucks, red_pucks = find_pucks(warped)
+    
+    blue_pucks_real = findDistances(warped.shape[0:2], (2.4384, 0.4064), blue_pucks)
 
-    blue_pucks_real = findDistances(warped.shape[0:2], (8, 2), blue_pucks)
-
-    red_pucks_real = findDistances(warped.shape[0:2], (8, 2), red_pucks)
-    print(blue_pucks_real, red_pucks_real)
+    red_pucks_real = findDistances(warped.shape[0:2], (2.4384, 0.4064), red_pucks)
+    # print(blue_pucks_real, red_pucks_real)
     return blue_pucks_real, red_pucks_real
 #get_real_board_state()
