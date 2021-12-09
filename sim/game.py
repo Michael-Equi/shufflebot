@@ -7,6 +7,7 @@ from random import seed
 
 import sim
 import players
+import src.shufflebot as shufflebot
 from cv_stuff.shuffle_board_cv import get_real_board_state
 
 class ShuffleBoardGame:
