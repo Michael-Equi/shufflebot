@@ -22,5 +22,4 @@ def homoFromMouse(img):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    warped = four_point_transform(img, np.array(points))
-    return warped
+    return points

@@ -51,7 +51,7 @@ def order_points(img, pts):
 	
 ### Takes in four points and image and returns warped 
 ### image transformed to top down view
-def four_point_transform(image, pts):
+def four_point_transform(image, pts, pixel_height, pixel_width):
     # obtain a consistent order of the points and unpack them
     # individually
     rect = order_points(image, pts)
@@ -85,9 +85,8 @@ def four_point_transform(image, pts):
     # print(dst)
     # print(M)
     warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
-    HEIGHT = 800
-    WIDTH = 150
-    resized = cv2.resize(warped, (HEIGHT, WIDTH))
+    
+    resized = cv2.resize(warped, (pixel_height, pixel_width))
     rotated = cv2.rotate(resized, cv2.ROTATE_90_CLOCKWISE)
     # return the warped image
     return rotated
@@ -306,8 +305,8 @@ def find_pucks(image):
     return [blue_pucks, red_pucks]
     
 def getImage():
-    img = cv2.imread("cv_stuff/1250t3.jpg", 1)
-    # img = cv2.imread("./1250t3.jpg", 1)
+    #img = cv2.imread("cv_stuff/headcam.jpg", 1)
+    img = cv2.imread("./1250t3.jpg", 1)
     return img
     # cam_port = 0
     # cam = cv2.VideoCapture(cam_port)
