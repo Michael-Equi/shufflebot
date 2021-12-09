@@ -38,7 +38,7 @@ class SimPlayer(Player):
             alt_score_div = [2,2,3,5]
     
         poss_x_pos = np.array([0.17, 0.25, 0.36])
-        poss_x_vel = np.arange(-0.18, 0.19, .01)
+        poss_x_vel = np.arange(-0.19, 0.16, .01)
         poss_y_vel = np.arange(1.0, 1.15, .01)
 
         shots = []
