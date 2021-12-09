@@ -12,12 +12,13 @@ def click_event(event, x, y, flags, params):
 
 def homoFromMouse(img):
     # displaying the image
-    imgS = cv2.resize(img, (img.shape[1] / 4, img.shape[0] / 4))
-    cv2.imshow('image', imgS)
+    mult = 1
+    # imgS = cv2.resize(img, (img.shape[1] / mult, img.shape[0] / mult))
+    cv2.imshow('image', img)
     points = []
     # setting mouse handler for the image
     # and calling the click_event() function
     cv2.setMouseCallback('image', click_event, points)  
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    return np.array(points) * 4
+    return np.array(points) * mult

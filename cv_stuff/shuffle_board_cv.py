@@ -7,15 +7,14 @@ from homography_from_mouse import homoFromMouse
 def get_real_board_state(length, width, pixel_height=800, pixel_width=150):
     # load the image
     img = getImage()
-    median = cv2.medianBlur(img,13)
-
     
-    corner_points = findCorners(median)
+
+    # corner_points = findCorners(img)
+    corner_points = [0]
     while len(corner_points) != 4:
         img = getImage()
-        median = cv2.medianBlur(img,13)
-        corner_points = homoFromMouse(median)
-
+        corner_points = homoFromMouse(img)
+    median = cv2.medianBlur(img,13)
     # for corner in corner_points:
     #     cv2.circle(img, tuple(corner), radius=0, color=(0, 0, 255), thickness=50)
     # imgS = cv2.resize(img, (960, 540))
