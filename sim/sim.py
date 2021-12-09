@@ -157,7 +157,7 @@ def visualize(state, fig, ax, length, width, teams={}, r=0.026):
 
 def animate(states, dt, length, width, teams={}, r=0.026):
     fig, ax = plt.subplots(figsize=(3, 6))
-    less_states = states[0::20]
+    less_states = states[0::10]
     for state in less_states:
         visualize(state, fig, ax, length, width, teams, r)
         plt.pause(dt)
