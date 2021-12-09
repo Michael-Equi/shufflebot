@@ -10,6 +10,8 @@ import players
 import src.shufflebot as shufflebot
 from cv_stuff.shuffle_board_cv import get_real_board_state
 
+sb = shufflebot.ShuffleBot()
+
 class ShuffleBoardGame:
     length = 2.4384
     width = 0.4572
@@ -22,7 +24,6 @@ class ShuffleBoardGame:
     def __init__(self):
         self.dt = 0.01
         self.sim = sim.ShuffleBoardSim(self.dt)
-        self.sb = shufflebot.ShuffleBot()
 
     def sim_turn(self, state, puck, x_pos, y_pos, x_vel, y_vel):
         original_x = state.get_all(puck)
@@ -140,17 +141,18 @@ class ShuffleBoardGame:
         for i in range(self.num_pucks):
             if i % 2 == 0:
                 raw_input("Press enter once human shot is complete")
+                puck_locs = get_real_board_state(game.length, game.width)
+                state = sim.State(self.num_pucks)
+                for idx, blue_puck in enumerate(puck_locs[0][:4]):
+                    state.set_x(idx*2, blue_puck[::-1])
+                for idx, red_puck in enumerate(puck_locs[1][:4]):
+                    state.set_x(idx*2+1, red_puck[::-1])
+
             else:
                 robo_shot = ai.calc_move(1, state, i)
                 _, xs = self.sim_turn(state, i, *robo_shot)
                 sim.animate(xs, self.dt, self.length, self.width, teams)
-                self.sb.perform_shot(robo_shot)
-            puck_locs = get_real_board_state(game.length, game.width)
-            state = sim.State(self.num_pucks)
-            for idx, blue_puck in enumerate(puck_locs[0][:4]):
-                state.set_x(idx*2, blue_puck[::-1])
-            for idx, red_puck in enumerate(puck_locs[1][:4]):
-                state.set_x(idx*2+1, red_puck[::-1])
+                sb.perform_shot(*robo_shot)
         
         score = self.score_board(state)
         print("Human Score: " + str(score[0]))

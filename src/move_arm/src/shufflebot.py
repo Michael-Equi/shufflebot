@@ -22,22 +22,25 @@ class ShuffleBot:
         self.gripper = robot_gripper.Gripper("right")
         f = open("src/poses.yaml", "r")
         self.pose_dict = yaml.load(f)
+        self.kick_radius = 0.22
+        print(self.pose_dict.keys())
 
     def poses(self):
         return self.pose_dict.keys()
 
-    def perform_shot(x_pos, y_pos, x_vel, y_vel):
-        theta = np.atan2(y_vel, x_vel) - np.pi / 2 # heading from North
+    def perform_shot(self, x_pos, y_pos, x_vel, y_vel):
+        theta = np.arctan2(y_vel, x_vel) - np.pi / 2 # heading from North
         v = np.sqrt(x_vel**2 + y_vel**2)
         hit_vel = v / np.cos(theta)
-        x_id = np.argmin(np.abs(hit_positions - x_pos)) + 1
+        ang_vel = hit_vel / self.kick_radius
+        x_id = np.argmin(np.abs(ShuffleBot.hit_positions - x_pos)) + 1
 
         # move robot to home pose
         self.move_to_pose("home")
         raw_input()
 
         # move to pre-grasp pose
-        self.move_to_pose(numbers[self.puck])
+        self.move_to_pose(ShuffleBot.numbers[self.puck])
         time.sleep(2)
 
         # open gripper
@@ -46,8 +49,8 @@ class ShuffleBot:
 
         # move to grasp pose
         grasp_pose = self.group.get_current_pose()
-        grasp_pose.position.z = ShuffleBot.table_z
-        self.move_cartesian(grasp_pose)
+        grasp_pose.pose.position.z = ShuffleBot.table_z
+        self.move_cartesian([grasp_pose.pose.position.x, grasp_pose.pose.position.y, grasp_pose.pose.position.z, 0, 0, 0])
         time.sleep(2)
 
         # close gripper
@@ -55,7 +58,7 @@ class ShuffleBot:
         raw_input()
 
         # return to pre-grasp
-        self.move_to_pose(numbers[self.puck])
+        self.move_to_pose(ShuffleBot.numbers[self.puck])
         time.sleep(2)
 
         # return to home pose
@@ -72,31 +75,38 @@ class ShuffleBot:
 
         # raise gripper
         raised_pose = self.group.get_current_pose()
-        raised_pose.position.z += 0.04
-        self.move_cartesian(raised_pose)
+        raised_pose.pose.position.z += 0.04
+        self.move_cartesian([raised_pose.pose.position.x, raised_pose.pose.position.y, raised_pose.pose.position.z, 0, 0, 0])
         raw_input()
 
+        # close gripper
+        self.close_gripper()
+        time.sleep(1)
+
         # wind up for strike
-        j_angles = self.group.get_current_joint_values()
-        j_angles += [0, 0, 0, 0, 0, -0.3, theta] # TODO: might be negative
+        j_angles = np.array(self.group.get_current_joint_values())
+        j_angles += np.array([0, 0, 0, 0, 0, -1.0, -theta]) # TODO: might be negative
+        self.move_to_joint_angles(j_angles)
         raw_input()
 
         # lower gripper
         lowered_pose = self.group.get_current_pose()
-        lowered_pose.position.z -= 0.04
-        self.move_cartesian(raised_pose)
+        lowered_pose.pose.position.z -= 0.04
+        self.move_cartesian([lowered_pose.pose.position.x, lowered_pose.pose.position.y, lowered_pose.pose.position.z, 0, 0, 0])
         raw_input()
 
         # strike puck
+        vel = lambda i, vi: dict(zip(self.right_arm.joint_names(), [0]*(i) + [vi] + [0]*(6-i)))
+
         t = 1
         for i in range(int(t * 10)):
-            right_arm.set_joint_velocities(np.array([0, 0, 0, 0, 0, hit_vel, 0])) # TODO: may be negative
+            self.right_arm.set_joint_velocities(vel(5, 5*ang_vel)) # TODO: may be negative
             time.sleep(0.1)
-        right_arm.set_joint_velocities(np.zeros(7))
+        self.right_arm.set_joint_velocities(vel(5, 0))
         raw_input()
 
         # go to home pose
-        self.go_to_pose("home")
+        self.move_to_pose("home")
 
         # iterate puck number
         self.puck += 1
@@ -108,10 +118,7 @@ class ShuffleBot:
         self.gripper.close()
 
     def move_to_pose(self, pose_name):
-        try:
-            pose = pose_dict[name]
-        except:
-            raise Exception("invalid pose")
+        pose = self.pose_dict[pose_name]
 
         js = np.array([float(v) for v in pose['joints'].replace('[','').replace(']', '').replace(' ', '').split(',')])
         self.move_to_joint_angles(js)
