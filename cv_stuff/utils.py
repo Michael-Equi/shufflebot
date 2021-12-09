@@ -309,8 +309,10 @@ def getImage():
     # img = cv2.imread("./1250t3.jpg", 1)
     # return img
     cam_port = 0
-    cam = cv2.VideoCapture(cam_port)
-    result, image = cam.read()
+    cap = cv2.VideoCapture(cam_port)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+    result, image = cap.read()
     if result:
         return image
     else:
