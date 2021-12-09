@@ -3,7 +3,7 @@ import os
 import scipy.spatial
 import rospy
 import intera_interface
-from moveit_commander import MoveGroupCommander # TODO: might be wrong import I don't really remember
+from moveit_commander import MoveGroupCommander
 import yaml
 from intera_interface import gripper as robot_gripper
 import time
@@ -25,7 +25,7 @@ class ShuffleBot:
     def poses(self):
         return self.pose_dict.keys()
 
-    def throw(x_pos, y_pos, x_vel, y_vel):
+    def perform_shot(x_pos, y_pos, x_vel, y_vel):
         theta = np.atan2(y_vel, x_vel) - np.pi / 2 # heading from North
         # move robot to home pose
         self.move_to_pose("home")
@@ -42,6 +42,25 @@ class ShuffleBot:
         # move to grasp pose
         to_pose = self.group.get_current_pose()
         
+        # close gripper
+
+        # return to pre-grasp
+
+        # return to home pose
+
+        # go to hit pose # TODO: michael start
+
+        # open gripper
+
+        # raise gripper
+
+        # wind up for strike
+
+        # lower gripper
+
+        # strike puck
+
+        # go to home pose # TODO: michael end
 
         # iterate puck number
         self.puck += 1
@@ -57,7 +76,7 @@ class ShuffleBot:
             pose = pose_dict[name]
         except:
             raise Exception("invalid pose")
-            continue
+
         js = np.array([float(v) for v in pose['joints'].replace('[','').replace(']', '').replace(' ', '').split(',')])
         self.move_to_joint_angles(js)
 
@@ -95,16 +114,6 @@ class ShuffleBot:
             self.right_arm.set_joint_velocities(dict(zip(self.right_arm.joint_names(), jv)))
 
         self.right_arm.set_joint_velocities(dict(zip(self.right_arm.joint_names(), np.array([0,0,0,0,0,0,0]))))
-
-
-
-        # robot_disp = np.dot(R_robot_sim, displacement_vector)
-        # # dist = np.linalg.norm(robot_disp)
-        # t = dist / speed # currently terrified of integer division
-
-        # V = robot_disp.append(np.zeros(3))
-        # TODO: remove os hacking
-        # os.system("rosrun move_arm get_manipulator_jacobian.py " + str(V)[1:-2])
 
 if __name__ == "__main__":
     sb = ShuffleBot()
