@@ -12,7 +12,7 @@ from cv_stuff.shuffle_board_cv import get_real_board_state
 class ShuffleBoardGame:
     length = 2.4384
     width = 0.4572
-    puck_rad = 0.0265
+    puck_rad = 0.026
     num_pucks = 8
     sl_3 = length * (23.0/24.0)
     sl_2 = length * (22.0/24.0)

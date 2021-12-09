@@ -77,7 +77,7 @@ class ShuffleBoardSim:
         # mass in kg
         self.m = 0.27
         # radius in m
-        self.r = 0.0265
+        self.r = 0.026
 
         self.dt = dt
         self.min_velocity = min_velocity
@@ -135,7 +135,7 @@ def simulate(sim, initial_state, game, tol=1e-3):
             return xs[-1], xs
 
 
-def visualize(state, fig, ax, length, width, teams={}, r=0.0265):
+def visualize(state, fig, ax, length, width, teams={}, r=0.026):
     sl_3 = length * (23.0/24.0)
     sl_2 = length * (22.0/24.0)
     sl_1 = length * (12.0/24.0)
@@ -155,7 +155,7 @@ def visualize(state, fig, ax, length, width, teams={}, r=0.0265):
     plt.axhline(y=sl_1)
 
 
-def animate(states, dt, length, width, teams={}, r=0.0265):
+def animate(states, dt, length, width, teams={}, r=0.026):
     fig, ax = plt.subplots(figsize=(3, 6))
     less_states = states[0::20]
     for state in less_states:
@@ -164,7 +164,7 @@ def animate(states, dt, length, width, teams={}, r=0.0265):
         ax.clear()
 
 
-def visualize_traj(states, fig, ax, length, width, teams={}, r=0.0265):
+def visualize_traj(states, fig, ax, length, width, teams={}, r=0.026):
     states_arr = np.array([np.array(state) for state in states])
     for puck in range(states[0].num_pucks):
         ax.plot(states_arr[:, puck * 2], states_arr[:, puck * 2 + 1])
