@@ -37,7 +37,7 @@ class SimPlayer(Player):
             true_score_div = [5,3,2,1]
             alt_score_div = [2,2,3,5]
     
-        poss_x_pos = np.array([self.game.width/4, self.game.width/2, 3*self.game.width/4])
+        poss_x_pos = np.array([0.17, 0.25, 0.36])
         poss_x_vel = np.arange(-0.18, 0.19, .01)
         poss_y_vel = np.arange(1.0, 1.15, .01)
 
