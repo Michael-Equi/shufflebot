@@ -4,7 +4,7 @@ from utils import *
 from homography_from_mouse import homoFromMouse
 # from homography_from_mouse import *
 
-def get_real_board_state(length, width):
+def get_real_board_state(length, width, pixel_height, pixel_width):
     # load the image
     img = getImage()
     # img = cv2.imread("./headcam_blackboard.jpg", 1)
@@ -12,19 +12,24 @@ def get_real_board_state(length, width):
 
     
     corner_points = findCorners(median)
-    if len(corner_points) == 4:
-        # for corner in corner_points:
-        #     cv2.circle(img, tuple(corner), radius=0, color=(0, 0, 255), thickness=5)
-        # imgS = cv2.resize(img, (960, 540))
-        # cv2.imshow("circled", imgS)
-        # cv2.waitKey(0)
-        warped = four_point_transform(median, corner_points)
-        # cv2.imshow("warped", warped)
-        # cv2.waitKey(0)
-    else:
-        warped = homoFromMouse(median)
+    #if True: # len(corner_points) != 4:
+    #    corner_points = homoFromMouse(median)
 
+    for corner in corner_points:
+        cv2.circle(img, tuple(corner), radius=0, color=(0, 0, 255), thickness=5)
+        imgS = cv2.resize(img, (960, 540))
+        cv2.imshow("circled", imgS)
+        cv2.waitKey(0)
+        
+    warped = four_point_transform(median, corner_points, pixel_height, pixel_width)
+    # cv2.imshow("warped", warped)
+    # cv2.waitKey(0)
+    
     blue_pucks, red_pucks = find_pucks(warped)
+
+    filter(blue_pucks, lambda x: x[1] > (2. * pixel_height / 3.))
+    filter(red_pucks, lambda x: x[1] > (2. * pixel_height / 3.))
+
 
     # for blue in blue_pucks:
     #     cv2.circle(warped, tuple(blue), radius=0, color=(0, 0, 255), thickness=5)
@@ -45,9 +50,10 @@ def get_real_board_state(length, width):
     red_pucks_real = findDistances(warped.shape[0:2], (length, width), red_pucks)
     print(blue_pucks_real, red_pucks_real)
     return blue_pucks_real, red_pucks_real
-    
-if __name__=="__main__":
 
+if __name__=="__main__":
+    pixel_height = 800
+    pixel_width = 150
     length = 2.4384
     width = 0.4572
-    get_real_board_state(length, width)
+    get_real_board_state(length, width, pixel_height, pixel_width)
