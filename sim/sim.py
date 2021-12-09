@@ -136,9 +136,9 @@ def simulate(sim, initial_state, game, tol=1e-3):
 
 
 def visualize(state, fig, ax, length, width, teams={}, r=0.026):
-    sl_3 = length * (23.0/24.0)
-    sl_2 = length * (22.0/24.0)
-    sl_1 = length * (12.0/24.0)
+    sl_3 = length * (92.0/96.0)
+    sl_2 = length * (88.0/96.0)
+    sl_1 = length * (48.0/96.0)
     for puck in range(state.num_pucks):
         pos = state.get_x(puck)
         if puck in teams.keys():
