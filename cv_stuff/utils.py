@@ -8,77 +8,88 @@ import itertools
 ### the second entry is the top-right, the third is the
 ### bottom-right, and the fourth is the bottom-left
 def order_points(img, pts):
-	# # initialzie a list of coordinates that will be ordered
-	# # such that the first entry in the list is the top-left,
-	# # the second entry is the top-right, the third is the
-	# # bottom-right, and the fourth is the bottom-left
-	# rect = np.zeros((4, 2), dtype = "float32")
-	# # the top-left point will have the smallest sum, whereas
-	# # the bottom-right point will have the largest sum
-	# s = pts.sum(axis = 1)
-	# rect[0] = pts[np.argmin(s)]
-	# rect[2] = pts[np.argmax(s)]
-	# # now, compute the difference between the points, the
-	# # top-right point will have the smallest difference,
-	# # whereas the bottom-left will have the largest difference
-	# diff = np.diff(pts, axis = 1)
-	# rect[1] = pts[np.argmin(diff)]
-	# rect[3] = pts[np.argmax(diff)]
-	# # return the ordered coordinates
-	top_left = np.array([0, 0])
-	top_right = np.array([img.shape[1], 0])
-	bottom_left = np.array([0, img.shape[0]])
-	bottom_right = np.array([img.shape[1], img.shape[0]])
+    # # initialzie a list of coordinates that will be ordered
+    # # such that the first entry in the list is the top-left,
+    # # the second entry is the top-right, the third is the
+    # # bottom-right, and the fourth is the bottom-left
+    # rect = np.zeros((4, 2), dtype = "float32")
+    # # the top-left point will have the smallest sum, whereas
+    # # the bottom-right point will have the largest sum
+    # s = pts.sum(axis = 1)
+    # rect[0] = pts[np.argmin(s)]
+    # rect[2] = pts[np.argmax(s)]
+    # # now, compute the difference between the points, the
+    # # top-right point will have the smallest difference,
+    # # whereas the bottom-left will have the largest difference
+    # diff = np.diff(pts, axis = 1)
+    # rect[1] = pts[np.argmin(diff)]
+    # rect[3] = pts[np.argmax(diff)]
 
-	targets = np.array([top_left, top_right, bottom_right, bottom_left])
-	#print(pts.shape)
-	perms = np.array(list(itertools.permutations(pts)))
-	#print(perms.shape, targets.shape)
-	best_combo = np.argmin(np.sum(np.linalg.norm(perms - targets, axis=1), axis=1))
-	rect = np.array(perms[best_combo], dtype = "float32")
-	# return the ordered coordinates
-	return rect
+    pts = [x for x in pts]
+    pts.sort(key=lambda x: x[1])
+    pts_bot = pts[2:]
+    pts_bot.sort(key=lambda x: x[0])
+    pts_top = pts[:2]
+    pts_top.sort(key=lambda x: -x[0])
+    pts_top.extend(pts_bot)
+    rect = np.array(pts_top, dtype = "float32")
+
+    # # return the ordered coordinates
+    # top_left = np.array([0, 0])
+    # top_right = np.array([img.shape[1], 0])
+    # bottom_left = np.array([0, img.shape[0]])
+    # bottom_right = np.array([img.shape[1], img.shape[0]])
+
+    # targets = np.array([top_left, top_right, bottom_right, bottom_left])
+    # #print(pts.shape)
+    # perms = np.array(list(itertools.permutations(pts)))
+    # #print(perms.shape, targets.shape)
+    # best_combo = np.argmin(np.sum(np.linalg.norm(perms - targets, axis=1), axis=1))
+    # rect = np.array(perms[best_combo], dtype = "float32")
+    # return the ordered coordinates
+    return rect
 	
 ### Takes in four points and image and returns warped 
 ### image transformed to top down view
 def four_point_transform(image, pts):
-	# obtain a consistent order of the points and unpack them
-	# individually
-	rect = order_points(image, pts)
-	(tl, tr, br, bl) = rect
-	# compute the width of the new image, which will be the
-	# maximum distance between bottom-right and bottom-left
-	# x-coordiates or the top-right and top-left x-coordinates
-	widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
-	widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
-	maxWidth = max(int(widthA), int(widthB))
-	# compute the height of the new image, which will be the
-	# maximum distance between the top-right and bottom-right
-	# y-coordinates or the top-left and bottom-left y-coordinates
-	heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
-	heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
-	maxHeight = max(int(heightA), int(heightB))
-	# now that we have the dimensions of the new image, construct
-	# the set of destination points to obtain a "birds eye view",
-	# (i.e. top-down view) of the image, again specifying points
-	# in the top-left, top-right, bottom-right, and bottom-left
-	# order
-	dst = np.array([
-		[0, 0],
-		[maxWidth - 1, 0],
-		[maxWidth - 1, maxHeight - 1],
-		[0, maxHeight - 1]], dtype = "float32")
-	# compute the perspective transform matrix and then apply it
-	M = cv2.getPerspectiveTransform(rect, dst)
-	# print(rect)
-	# print(dst)
-	# print(M)
-	warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
-	HEIGHT = 800
-	WIDTH = 200
-	resized = cv2.resize(warped, (WIDTH, HEIGHT))
-	# return the warped image
-	return resized
+    # obtain a consistent order of the points and unpack them
+    # individually
+    rect = order_points(image, pts)
+    (tl, tr, br, bl) = rect
+    # compute the width of the new image, which will be the
+    # maximum distance between bottom-right and bottom-left
+    # x-coordiates or the top-right and top-left x-coordinates
+    widthA = np.sqrt(((br[0] - bl[0]) ** 2) + ((br[1] - bl[1]) ** 2))
+    widthB = np.sqrt(((tr[0] - tl[0]) ** 2) + ((tr[1] - tl[1]) ** 2))
+    maxWidth = max(int(widthA), int(widthB))
+    # compute the height of the new image, which will be the
+    # maximum distance between the top-right and bottom-right
+    # y-coordinates or the top-left and bottom-left y-coordinates
+    heightA = np.sqrt(((tr[0] - br[0]) ** 2) + ((tr[1] - br[1]) ** 2))
+    heightB = np.sqrt(((tl[0] - bl[0]) ** 2) + ((tl[1] - bl[1]) ** 2))
+    maxHeight = max(int(heightA), int(heightB))
+    # now that we have the dimensions of the new image, construct
+    # the set of destination points to obtain a "birds eye view",
+    # (i.e. top-down view) of the image, again specifying points
+    # in the top-left, top-right, bottom-right, and bottom-left
+    # order
+    dst = np.array([
+        [0, 0],
+        [maxWidth - 1, 0],
+        [maxWidth - 1, maxHeight - 1],
+        [0, maxHeight - 1]], dtype = "float32")
+    # compute the perspective transform matrix and then apply it
+    M = cv2.getPerspectiveTransform(rect, dst)
+    # print("maskldfjklsd")
+    # print("rect:", rect)
+    # print(dst)
+    # print(M)
+    warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
+    HEIGHT = 800
+    WIDTH = 133
+    resized = cv2.resize(warped, (WIDTH, HEIGHT))
+    # return the warped image
+    return resized
 
 
 
@@ -105,6 +116,7 @@ def findCorners(img):
     #lower = [100, 130, 130]
     lower = [90, 105, 110]
     upper = [255, 255, 255]
+    
 
     # create NumPy arrays from the boundaries
     lower = np.array(lower, dtype="uint8")
@@ -163,9 +175,14 @@ def findCorners(img):
     perim = cv2.arcLength(c, True)
     epsilon = 0.02*perim
     approxCorners = cv2.approxPolyDP(c, epsilon, True)
+    # print(approxCorners)
     # approxCornersNumber = len(approxCorners)
     # print("Number of approximated corners: ", approxCornersNumber)
     # print("Coordinates of approximated corners:\n", approxCorners)
+
+    # corner_points = np.zeros(len(approxCorners), dtype='f,f')
+    # for i in range(len(approxCorners)):
+    #     corner_points[i] = [approxCorners[i][0][0], approxCorners[i][0][1]]
     corner_points = np.array([[x[0][0], x[0][1]] for x in approxCorners])
     # print("input" ,(corner_points))
     return corner_points
@@ -190,20 +207,11 @@ def farFromPoint(x, points, epsilon=5):
 
 ### Find centroids of pucks in a warped image of shuffleboard table
 def find_pucks(image):
-    # lower = [0,0,0]#[20, 20, 20]
-    # upper = [150, 150, 150]
-    # lower = np.array(lower, dtype="uint8")
-    # upper = np.array(upper, dtype="uint8")
-    # mask = cv2.inRange(image, lower, upper)
-    # masked0 = cv2.bitwise_and(image, image, mask=mask)
-    
-
+    cv2.imshow("image", image)
+    cv2.waitKey(0)
     # convert to HSV
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
-    #h,s,v = cv2.split(hsv)
-    # red is 0 in range 0 to 360; so half in OpenCV
-    # blue is 240 in range 0 to 360; so half in OpenCV
     lower_red = 0
     upper_red = 30 /2
     lower_red2 = 330 /2
@@ -286,3 +294,6 @@ def find_pucks(image):
     # print("red:" , red_pucks)
     return [blue_pucks, red_pucks]
     
+def getImage():
+    img = cv2.imread("headcam.jpg", 1)
+    return img

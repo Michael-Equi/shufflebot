@@ -13,11 +13,18 @@ def get_real_board_state():
     # cv2.imshow("warped", warped)
     # warped = homoFromMouse(img)
 
+
+    # for corner in corner_points:
+    #     cv2.circle(img, tuple(corner), radius=0, color=(0, 0, 255), thickness=5)
+    # cv2.imshow("circled", img)
+    # cv2.waitKey(0)
+
+
     blue_pucks, red_pucks = find_pucks(warped)
 
     blue_pucks_real = findDistances(warped.shape[0:2], (8, 2), blue_pucks)
 
     red_pucks_real = findDistances(warped.shape[0:2], (8, 2), red_pucks)
-
+    print(blue_pucks_real, red_pucks_real)
     return blue_pucks_real, red_pucks_real
-
+#get_real_board_state()
