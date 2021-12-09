@@ -8,19 +8,19 @@ def get_real_board_state(length, width, pixel_height=800, pixel_width=150):
     # load the image
     img = getImage()
     
-    median = cv2.medianBlur(img,13)
-    corner_points = findCorners(median)
+    # median = cv2.medianBlur(img,13)
+    corner_points = findCorners(img)
     while len(corner_points) != 4:
         img = getImage()
         corner_points = homoFromMouse(img)
     
-    for corner in corner_points:
-        cv2.circle(img, tuple(corner), radius=0, color=(0, 0, 255), thickness=10)
-    imgS = cv2.resize(img, (960, 540))
-    cv2.imshow("circled", imgS)
-    cv2.waitKey(0)
-    print(corner_points)
-    warped = four_point_transform(median, corner_points, pixel_height, pixel_width)
+    # for corner in corner_points:
+    #     cv2.circle(img, tuple(corner), radius=0, color=(0, 0, 255), thickness=10)
+    # imgS = cv2.resize(img, (960, 540))
+    # cv2.imshow("circled", img)
+    # cv2.waitKey(0)
+    # print(corner_points)
+    warped = four_point_transform(img, corner_points, pixel_height, pixel_width)
     # warpedS = cv2.resize(warped, (150, 800))
     cv2.imshow("warped", warped)
     cv2.waitKey(0)
