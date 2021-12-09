@@ -11,10 +11,12 @@ from cv_stuff.shuffle_board_cv import get_real_board_state
 
 class ShuffleBoardGame:
     length = 2.4384
-    width = 0.4064
-    sl_3 = length * (15.0/16.0)
-    sl_2 = length * (14.0/16.0)
-    sl_1 = length * (10.0/16.0)
+    width = 0.4572
+    puck_rad = 0.0265
+    num_pucks = 8
+    sl_3 = length * (23.0/24.0)
+    sl_2 = length * (22.0/24.0)
+    sl_1 = length * (12.0/24.0)
 
     def __init__(self):
         self.dt = 0.01
@@ -34,7 +36,7 @@ class ShuffleBoardGame:
         scores = [0,0]
         y_pos = [[self.sl_1],[self.sl_1]]
 
-        for i in range(state.num_pucks):
+        for i in range(self.num_pucks):
             pos = state.get_x(i)
             if pos[0] >= 0 and pos[0] <= width and pos[1] <= length and pos[1] > self.sl_1:
                 y_pos[i%2].append(pos[1])
@@ -53,7 +55,7 @@ class ShuffleBoardGame:
         return scores
 
     def board_heuristics(self, state):
-        num_pucks = [0,0]
+        pucks_on_board = [0,0]
         alt_score = [0,0]
 
         width = ShuffleBoardGame.width
@@ -62,7 +64,7 @@ class ShuffleBoardGame:
         for i in range(state.num_pucks):
             pos = state.get_x(i)
             if pos[0] >= 0 and pos[0] <= width and pos[1] <= length and pos[1] > 0:
-                num_pucks[i%2] += 1
+                pucks_on_board[i%2] += 1
                 if pos[1] > self.sl_3:
                     alt_score[i%2] += 3
                 elif pos[1] > self.sl_2:
@@ -70,7 +72,7 @@ class ShuffleBoardGame:
                 elif pos[1] > self.sl_1:
                     alt_score[i%2] += 1
 
-        return num_pucks, alt_score
+        return pucks_on_board, alt_score
 
     def display_board(self):
         fig, ax = plt.subplots(figsize=(3, 6))
@@ -87,22 +89,23 @@ class ShuffleBoardGame:
         plt.show()
 
     def run_sim_game(self):
-        num_pucks = 8 # Num pucks total
-        state = sim.State(num_pucks)
+        state = sim.State(self.num_pucks)
         p1 = players.SimPlayer(self)
         p2 = players.SimPlayer(self)
         # seed(42)
         # p2 = players.RandomPlayer()
         teams = {} # This should only be used for visualization
-        for i in range(num_pucks):
+        for i in range(self.num_pucks):
             if i % 2 == 0:
                 teams[i] = 'red'
-                # state, xs = self.sim_turn(state, i, self.width/2,0.1,0.0,1.15)
+                # state, xs = self.sim_turn(state, i, self.width/2,0.1,0.0,1.1)
                 state, xs = self.sim_turn(state, i, *p1.calc_move(0, state, i))
             else:
                 teams[i] = 'blue'
                 # state, xs = self.sim_turn(state, i, 0,0,0,0)
                 state, xs = self.sim_turn(state, i, *p2.calc_move(1, state, i))
+            print(self.score_board(state))
+            print(self.board_heuristics(state))
             sim.animate(xs, self.dt, self.length, self.width, teams)
             # sim.visualize_traj(xs[1:], fig, ax, self.length, self.width, teams)
         
@@ -110,14 +113,13 @@ class ShuffleBoardGame:
         print(self.board_heuristics(state))
 
         plt.close('all')
-        r = 0.02936875
         fig, ax = plt.subplots(figsize=(3, 6))
-        for puck in range(state.num_pucks):
+        for puck in range(self.num_pucks):
             pos = state.get_x(puck)
             if puck in teams.keys():
-                ax.add_artist(plt.Circle(pos, r, color=teams[puck]))
+                ax.add_artist(plt.Circle(pos, self.puck_rad, color=teams[puck]))
             else:
-                ax.add_artist(plt.Circle(pos, r, color="pink"))
+                ax.add_artist(plt.Circle(pos, self.puck_rad, color="pink"))
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         plt.axis('square')
@@ -129,12 +131,11 @@ class ShuffleBoardGame:
         plt.show()
 
     def run_real_game(self):
-        num_pucks = 8 # Num pucks total
-        state = sim.State(num_pucks)
+        state = sim.State(self.num_pucks)
         ai = players.SimPlayer(self)
 
         teams = {}
-        for i in range(num_pucks):
+        for i in range(self.num_pucks):
             if i % 2 == 0:
                 teams[i] = 'red'
                 input("Press enter once human shot is complete")
@@ -142,20 +143,22 @@ class ShuffleBoardGame:
                 teams[i] = 'blue'
                 robo_shot = ai.calc_move(1, state, i)
                 perform_shot(robo_shot) # TODO: Create perform_shot to make robot shoot based on input
-            state = get_real_board_state()
+            puck_locs = get_real_board_state(game.length, game.width)
+            state = sim.State(self.num_pucks)
+            for i in range(self.num_pucks):
+                state.set_x(i, puck_locs[i%2][int(i/2)][::-1])
         
         score = self.score_board(state)
         print("Human Score: " + str(score[0]))
         print("Robot Score: " + str(score[1]))
 
-        r = 0.02936875
         fig, ax = plt.subplots(figsize=(3, 6))
-        for puck in range(state.num_pucks):
+        for puck in range(self.num_pucks):
             pos = state.get_x(puck)
             if puck in teams.keys():
-                ax.add_artist(plt.Circle(pos, r, color=teams[puck]))
+                ax.add_artist(plt.Circle(pos, self.puck_rad, color=teams[puck]))
             else:
-                ax.add_artist(plt.Circle(pos, r, color="pink"))
+                ax.add_artist(plt.Circle(pos, self.puck_rad, color="pink"))
         ax.set_xlabel('X')
         ax.set_ylabel('Y')
         plt.axis('square')
@@ -169,32 +172,32 @@ class ShuffleBoardGame:
 if __name__ == '__main__':
     game = ShuffleBoardGame()
     # # game.run_real_game()
-    # game.run_sim_game()
-    puck_locs = get_real_board_state()
-    print(puck_locs)
-    state = sim.State(8)
-    for i in range(8):
-        state.set_x(i, puck_locs[i%2][int(i/2)][::-1])
+    game.run_sim_game()
 
-    print(game.score_board(state))
-    print(game.board_heuristics(state))
+    # puck_locs = get_real_board_state(game.length, game.width)
+    # state = sim.State(game.num_pucks)
+    # for i in range(game.num_pucks):
+    #     state.set_x(i, puck_locs[i%2][int(i/2)][::-1])
 
-    teams = {0:'red', 1:'blue', 2:'red', 3:'blue', 4:'red', 5:'blue', 6:'red', 7:'blue'}
-    r = 0.02936875
-    fig, ax = plt.subplots(figsize=(3, 6))
-    for puck in range(state.num_pucks):
-        pos = state.get_x(puck)
-        if puck in teams.keys():
-            ax.add_artist(plt.Circle(pos, r, color=teams[puck]))
-        else:
-            ax.add_artist(plt.Circle(pos, r, color="pink"))
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    plt.axis('square')
-    plt.xlim([0, game.width])
-    plt.ylim([0, game.length])
-    plt.axhline(y=game.sl_3)
-    plt.axhline(y=game.sl_2)
-    plt.axhline(y=game.sl_1)
-    plt.show()
+    # print(game.score_board(state))
+    # print(game.board_heuristics(state))
+
+    # teams = {0:'red', 1:'blue', 2:'red', 3:'blue', 4:'red', 5:'blue', 6:'red', 7:'blue'}
+    
+    # fig, ax = plt.subplots(figsize=(3, 6))
+    # for puck in range(game.num_pucks):
+    #     pos = state.get_x(puck)
+    #     if puck in teams.keys():
+    #         ax.add_artist(plt.Circle(pos, game.puck_rad, color=teams[puck]))
+    #     else:
+    #         ax.add_artist(plt.Circle(pos, game.puck_rad, color="pink"))
+    # ax.set_xlabel('X')
+    # ax.set_ylabel('Y')
+    # plt.axis('square')
+    # plt.xlim([0, game.width])
+    # plt.ylim([0, game.length])
+    # plt.axhline(y=game.sl_3)
+    # plt.axhline(y=game.sl_2)
+    # plt.axhline(y=game.sl_1)
+    # plt.show()
     

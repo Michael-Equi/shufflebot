@@ -1,7 +1,7 @@
 from utils import *
 # from homography_from_mouse import *
 
-def get_real_board_state():
+def get_real_board_state(length, width):
     # load the image
     img = getImage()
     # img = cv2.imread("./headcam_blackboard.jpg", 1)
@@ -22,9 +22,9 @@ def get_real_board_state():
 
     blue_pucks, red_pucks = find_pucks(warped)
     
-    blue_pucks_real = findDistances(warped.shape[0:2], (2.4384, 0.4064), blue_pucks)
+    blue_pucks_real = findDistances(warped.shape[0:2], (length, width), blue_pucks)
 
-    red_pucks_real = findDistances(warped.shape[0:2], (2.4384, 0.4064), red_pucks)
+    red_pucks_real = findDistances(warped.shape[0:2], (length, width), red_pucks)
     # print(blue_pucks_real, red_pucks_real)
     return blue_pucks_real, red_pucks_real
 #get_real_board_state()

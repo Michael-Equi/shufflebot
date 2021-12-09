@@ -39,7 +39,7 @@ class SimPlayer(Player):
     
         poss_x_pos = np.array([self.game.width/4, self.game.width/2, 3*self.game.width/4])
         poss_x_vel = np.arange(-0.18, 0.19, .01)
-        poss_y_vel = np.arange(1.2, 1.27, .01)
+        poss_y_vel = np.arange(1.0, 1.15, .01)
 
         shots = []
         for x_pos in poss_x_pos:
@@ -64,9 +64,10 @@ class SimPlayer(Player):
                 # Number of pucks in play on board, score with all pucks counted
                 num_pucks, alt_score = self.game.board_heuristics(xf)
 
-                scaled_score_diff = (score[0] - score[1])/true_score_div[turn] # Usually max 3
-                scaled_alt_score_diff = (alt_score[0] - alt_score[1])/alt_score_div[turn] # Max possible 12
-                scaled_num_pucks_diff = (num_pucks[0] - num_pucks[1])/num_puck_div # Max possible 4
+                scaled_score_diff = float(score[0] - score[1])/true_score_div[turn] # Usually max 3
+                scaled_alt_score_diff = float(alt_score[0] - alt_score[1])/alt_score_div[turn] # Max possible 12
+                scaled_num_pucks_diff = float(num_pucks[0] - num_pucks[1])/num_puck_div # Max possible 4
+                # print(scaled_score_diff, scaled_alt_score_diff, scaled_num_pucks_diff)
 
                 x_pos_loc = np.searchsorted(poss_x_pos, r[1][0])
                 x_vel_loc = np.searchsorted(poss_x_vel, r[1][1])
@@ -77,8 +78,8 @@ class SimPlayer(Player):
             if player == 1:
                 shot_scores = -shot_scores
 
-            np.set_printoptions(formatter={'float': lambda x: "{0:0.2f}".format(x)})
-            # print(shot_scores)
+            np.set_printoptions(formatter={'float': lambda x: "{0:0.2f}".format(x)}, threshold=10000)
+            print(shot_scores)
             shot_scores = gaussian_filter(shot_scores, sigma=(0,1,1), mode='constant')
 
             max_shot_val = np.max(shot_scores)

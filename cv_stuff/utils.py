@@ -86,7 +86,7 @@ def four_point_transform(image, pts):
     # print(M)
     warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
     HEIGHT = 800
-    WIDTH = 133
+    WIDTH = 150
     resized = cv2.resize(warped, (WIDTH, HEIGHT))
     # return the warped image
     return resized
