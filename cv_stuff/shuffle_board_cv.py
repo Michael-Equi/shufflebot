@@ -9,7 +9,8 @@ def get_real_board_state(length, width, pixel_height=800, pixel_width=150):
     img = getImage()
     
     # median = cv2.medianBlur(img,13)
-    corner_points = findCorners(img)
+    # corner_points = findCorners(img)
+    corner_points = [0]
     while len(corner_points) != 4:
         img = getImage()
         corner_points = homoFromMouse(img)
