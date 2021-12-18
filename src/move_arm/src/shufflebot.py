@@ -7,6 +7,7 @@ from moveit_commander import MoveGroupCommander
 import yaml
 from intera_interface import gripper as robot_gripper
 import time
+from intera_core_msgs.msg import JointCommand
 
 class ShuffleBot:
     table_z = -0.23
@@ -23,6 +24,7 @@ class ShuffleBot:
         f = open("src/poses.yaml", "r")
         self.pose_dict = yaml.load(f)
         self.kick_radius = 0.22
+        self.pub = rospy.Publisher('/robot/limb/right/joint_command', JointCommand, queue_size=10)
         print(self.pose_dict.keys())
 
     def poses(self):
@@ -55,6 +57,7 @@ class ShuffleBot:
 
         # close gripper
         self.close_gripper()
+        print("Puck Grasped")
         raw_input()
 
         # return to pre-grasp
@@ -63,7 +66,7 @@ class ShuffleBot:
 
         # return to home pose
         self.move_to_pose("home")
-        raw_input()
+        time.sleep(0.5)
 
         # go to hit pose
         self.move_to_pose("hit" + str(x_id))
@@ -96,6 +99,7 @@ class ShuffleBot:
         raw_input()
 
         # strike puck
+        """
         vel = lambda i, vi: dict(zip(self.right_arm.joint_names(), [0]*(i) + [vi] + [0]*(6-i)))
 
         t = 1
@@ -103,10 +107,22 @@ class ShuffleBot:
             self.right_arm.set_joint_velocities(vel(5, 5*ang_vel)) # TODO: may be negative
             time.sleep(0.1)
         self.right_arm.set_joint_velocities(vel(5, 0))
+        """
+        joint_ctrl_msg = JointCommand()
+        joint_ctrl_msg.names = ['right_j0', 'head_pan', 'right_j1', 'right_j2', 'right_j3', 'right_j4', 'right_j5', 'right_j6']
+        joint_ctrl_msg.mode = int(2)
+        for _ in range(20):
+            joint_ctrl_msg.velocity = [0, 0, 0, 0, 0, 0, ang_vel, 0]
+            joint_ctrl_msg.header.stamp = rospy.Time.now()
+            self.pub.publish(joint_ctrl_msg)
+            time.sleep(0.1)
+        time.sleep(0.5)
+        joint_ctrl_msg.velocity = [0, 0, 0, 0, 0, 0, 0, 0]
+        self.pub.publish(joint_ctrl_msg)
         raw_input()
 
-        # go to home pose
-        self.move_to_pose("home")
+        # go to imaging pose
+        self.move_to_pose("imaging")
 
         # iterate puck number
         self.puck += 1
@@ -147,12 +163,12 @@ class ShuffleBot:
             Jinv = np.linalg.pinv(Js)
 
             e = target_pose - pose
-            print(np.linalg.norm(e))
+            # print(np.linalg.norm(e))
             vel = np.dot(Kp, e)
 
             jv = np.dot(Jinv, np.array(vel, dtype=np.float64))
             _, s, _= np.linalg.svd(Js)
-            print "manipulability: " +  str(np.prod(s))
+            # print "manipulability: " +  str(np.prod(s))
             self.right_arm.set_joint_velocities(dict(zip(self.right_arm.joint_names(), jv)))
 
         self.right_arm.set_joint_velocities(dict(zip(self.right_arm.joint_names(), np.array([0,0,0,0,0,0,0]))))

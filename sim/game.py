@@ -149,7 +149,9 @@ class ShuffleBoardGame:
                     state.set_x(idx*2+1, red_puck[::-1])
 
             else:
+                print("Thinking...")
                 robo_shot = ai.calc_move(1, state, i)
+                print("Prepare to lose")
                 _, xs = self.sim_turn(state, i, *robo_shot)
                 sim.animate(xs, self.dt, self.length, self.width, teams)
                 sb.perform_shot(*robo_shot)
