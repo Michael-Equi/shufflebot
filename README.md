@@ -1,5 +1,7 @@
 # shufflebot
 
+For more information see https://sites.google.com/berkeley.edu/shufflebot
+
 ./intera.sh alan
 rosrun intera_interface joint_trajectory_action_server.py
 roslaunch sawyer_moveit_config sawyer_moveit.launch electric_gripper:=true
